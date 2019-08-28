@@ -12,6 +12,8 @@ const webpackBaseConfig = require('./webpack.base.config.js');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 
 
+
+
 module.exports = merge(webpackBaseConfig, {
     devtool: 'eval-source-map',
 

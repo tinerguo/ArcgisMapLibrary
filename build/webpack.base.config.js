@@ -111,7 +111,8 @@ module.exports = {
         new webpack.optimize.ModuleConcatenationPlugin(),
         new ExtractTextPlugin('amuiLayout.css'),
         new webpack.DefinePlugin({
-            'process.env.VERSION': `'${pkg.version}'`
+            'process.env.VERSION': `'${pkg.version}'`,
+            'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`
         }),
     ]
 };

@@ -1,8 +1,7 @@
 <template>
   <div class="page-login">
 
-          我是登录页面,你好dfdf
-
+          首页
   </div>
 </template>
 

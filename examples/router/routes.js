@@ -1,20 +1,49 @@
-import layoutHeaderAside from '@/layout/header-aside'
-
-
 // 由于懒加载页面太多的话会造成webpack热更新太慢，所以开发环境不使用懒加载，只有生产环境使用懒加载
-const _import = require('@/libs/util.import.' + process.env.NODE_ENV)
+const _import = require('ex/libs/util.import.' + process.env.NODE_ENV)
 
+
+import layout from 'ex/layout'
 
 
 /**
  * 在主框架内显示
  */
-const frameIn = [];
+const frameIn = [
+        {
+                path: '/index',
+                name: 'index',
+                component: layout,
+                children: [
+                  {
+                          path: '',
+                          name: '',
+                          meta: {
+                                  auth: true
+                          },
+                          component: _import('system/index')
+                  },
+                  {
+                          path: 'index',
+                          name: 'index',
+                          meta: {
+                                  auth: true
+                          },
+                          component: _import('system/index')
+                  }
+                ]
+        }
+];
 
 /**
  * 在主框架之外显示
  */
-const frameOut = [];
+const frameOut = [
+        {
+                path: '/login',
+                name: 'login',
+                component: _import('system/login')
+        }
+];
 
 /**
  * 错误页面
@@ -25,6 +54,7 @@ const errorPage = [];
 export const frameInRoutes = frameIn
 
 export default [
+        ...frameIn,
         ...frameOut,
         ...errorPage
 ]
