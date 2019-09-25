@@ -1,6 +1,7 @@
 {
     "presets": [
-        ["env", {
+        [
+          "env", {
             "loose": false,
             "modules": "commonjs",
             "spec": true,
@@ -20,6 +21,9 @@
         }],
         "stage-3"
     ],
+    "ignore": [
+      "./src/arcgisWiget/mapPopUpWin/*.js"
+    ],
     "plugins": [
         "dynamic-import-node",
         "transform-class-properties",
@@ -32,7 +36,8 @@
             "libraryName": "element-ui",
             "styleLibraryName": "theme-chalk"
           }
-        ]
+        ],
+        "transform-remove-strict-mode"
     ],
     "comments": false
 }

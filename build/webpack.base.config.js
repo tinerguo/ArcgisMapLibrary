@@ -109,7 +109,7 @@ module.exports = {
     },
     plugins: [
         new webpack.optimize.ModuleConcatenationPlugin(),
-        new ExtractTextPlugin('amuiLayout.css'),
+        new ExtractTextPlugin('amumap.css'),
         new webpack.DefinePlugin({
             'process.env.VERSION': `'${pkg.version}'`,
             'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`

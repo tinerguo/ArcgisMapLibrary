@@ -1,10 +1,6 @@
 /**
  * Created by tiner on 2019/8/27.
  */
-var d2admin = {
-    namespaced: true,
-    modules
-};
 
 import Vue from 'vue';
 import Vuex from 'vuex';
@@ -21,7 +17,5 @@ files.keys().forEach(key => {
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-    modules: {
-        d2admin
-    }
+    modules
 });

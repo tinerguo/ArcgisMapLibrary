@@ -1,28 +1,29 @@
 /**
  * Created by tiner on 2019/8/27.
  */
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
 
 // 进度条
-import NProgress from 'nprogress'
-import 'nprogress/nprogress.css'
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 
 
 // 路由数据
-import routes from './routes'
+import routes from './routes';
 
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 // 导出路由 在 main.js 里使用
 const router = new VueRouter({
-        routes
-})
+    routes,
+    linkActiveClass: 'active'
+});
 
 router.afterEach(to => {
-        // 进度条
-        NProgress.done()
-})
+    // 进度条
+    NProgress.done();
+});
 
-export default router
+export default router;

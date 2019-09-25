@@ -32,12 +32,20 @@ const frameIn = [
                 component: _import('system/index')
             },
             {
-                path: 'show',
-                name: 'show',
+                path: 'win',
+                name: 'win',
                 meta: {
                     auth: true
                 },
-                component: _import('system/index')
+                component: _import('system/wind')
+            },
+            {
+                path: 'drowmap',
+                name: 'drowmap',
+                meta: {
+                    auth: true
+                },
+                component: _import('system/drowmap')
             }
         ]
     }
