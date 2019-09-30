@@ -18,7 +18,7 @@ export let defaultSetting = {
     baseMap:{
         visibility:true,
         type:'tdt',//谷歌地图:google,天地图:tdt
-        defaultshow:'terrains',//影像图:images,地形图:terrains,矢量图:layers
+        defaultshow:'layers',//影像图:imagesLayer,地形图:terrains,矢量图:layers
         labelLayerVisibility:true,//地图标注
         shadeLayer:{
             visibility:false,
@@ -55,38 +55,6 @@ export let defaultSetting = {
                 textSearchParams:['NAME','Shape','GB','ANGLE','ORIG_FID']
             }
         }
-    },
-    lend:{
-        shadeLayerVisibility:false,
-        labelsLayerVisibility:false,
-        dynLayers:{
-            isGroup:true,//是否分组
-            //   分组类型：
-            //    系统提供三种分组,custom,layers,all
-            //   custom:自定义分组规则，可以安装个人喜好高度定制
-            //   layers：按照动态图层进行排序，一个图层是一个组
-            //   all:所有图层分到一个组中
-            groupType:'',
-            group:[
-                {
-                    name:'静海图层',
-                    ids:[{
-                        layerid:'DLbackalllayer',
-                        ledid:0
-                    }]
-                },
-                {
-                    name:'宁河图层',
-                    ids:[{
-                        layerid:'DLbackalllayer',
-                        ledid:0
-                    }
-                    ]
-                }
-            ]
-        },
-        stations:[
-
-        ]
     }
+
 };

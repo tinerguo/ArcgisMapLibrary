@@ -7,12 +7,19 @@ var MAP_ADD_LAYER = 'mapaddlayer';//地图创建图层
 var MAP_ADD_LAYER_SUCCESS = 'mapaddlayersuccess';//地图创建图层成功
 var MAP_CLEAR = 'mapclear';//清空地图
 var MAP_CENTER= 'mapcenter';//地图定位
+var MAP_CENTER_STATION= 'mapcenterstation';//地图定位
+var MAP_DROWGEOJSONPOLYGON = 'DrowGeoJsonPolygon';//绘制geojson
+var MAP_STATUS_CHANGE = 'mapStatusChange';//地图状态改变事件
+
 export default {
     MAP_INIT_EVENT,
     MAP_ADD_LAYER,
     MAP_ADD_LAYER_SUCCESS,
     MAP_CLEAR,
-    MAP_CENTER
+    MAP_CENTER,
+    MAP_DROWGEOJSONPOLYGON,
+    MAP_CENTER_STATION,
+    MAP_STATUS_CHANGE
 };
 
 export function AMEvent(page){
@@ -30,6 +37,15 @@ export function AMEvent(page){
     this.uid = parent._uid;
 }
 AMEvent.prototype = {
+    checkMapInit(){
+        if (this.page.$ammap['uid'+this.uid].map &&
+        this.page.$ammap['uid'+this.uid].defaultSetting &&
+        this.page.$ammap['uid'+this.uid].mapLayers){
+            return true;
+        }
+        return false;
+
+    },
     getGIS:function(){
         return this.page.$ammap.GIS;
     },
@@ -60,6 +76,9 @@ AMEvent.prototype = {
         return this.page.$ammap['uid'+this.uid].map;
     },
     getMapLayers:function (){
+        if (!this.page.$ammap['uid'+this.uid]){
+            return null;
+        }
         return this.page.$ammap['uid'+this.uid].mapLayers;
     },
     getDefaultSetting:function (){
@@ -82,7 +101,4 @@ AMEvent.prototype = {
     getBaseType:function (){
         return this.page.$ammap['uid'+this.uid].baseType;
     }
-    // setStationsLayers:function (stationsLayers){
-    //     this.page.$ammap['uid'+this.uid].stationsLayers = stationsLayers;
-    // }
 };

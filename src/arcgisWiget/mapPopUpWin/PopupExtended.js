@@ -6,7 +6,6 @@ function override(method) {
 
     /** @this target object */
     proxy = function () {
-        debugger;
         let me = this;
         let inherited = this.getInherited && this.getInherited({
             // emulating empty arguments
@@ -71,7 +70,6 @@ export const PopupT = function (GIS) {
         //#region override some of the popups public methods
 
         setMap: function (map) {
-            debugger;
             this.map = map;
 
             //wire up some events

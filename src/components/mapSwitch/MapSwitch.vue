@@ -3,13 +3,13 @@
     :class="{'expand':this.expand}"
      class="mapSwitch" id=mapType-wrapper >
         <div v-show="mapLoadFlag" id="mapType">
-           <div data-type="yx" @click="CardClickEvent('yx')" :class="{'active':this.currentMap === 'yx'}" class="mapTypeCard earth">
+           <div data-type="imagesLayer" @click="CardClickEvent('imagesLayer')" :class="{'active':this.currentMap === 'imagesLayer'}" class="mapTypeCard earth">
             <div>影像图</div>
           </div>
-          <div data-type="dl" @click="CardClickEvent('dl')"  :class="{'active':this.currentMap === 'dl'}" class="mapTypeCard normal choosedType ">
+          <div data-type="layers" @click="CardClickEvent('terrains')"  :class="{'active':this.currentMap === 'terrains'}" class="mapTypeCard normal choosedType ">
             <div>道路图</div>
           </div>
-          <div data-type="dx" @click="CardClickEvent('dx')" :class="{'active':this.currentMap === 'dx'}"  class="mapTypeCard  panorama">
+          <div data-type="terrains" @click="CardClickEvent('layers')" :class="{'active':this.currentMap === 'layers'}"  class="mapTypeCard  panorama">
             <div>地形图</div>
           </div>
         </div>
@@ -28,7 +28,7 @@ export default {
             amEvent:{},
             terrainsLayer:{},
             layersLayer:{},
-            currentMap:'yx',//当前地图
+            currentMap:'imagesLayer',//当前地图
             mapLoadFlag:false
         };
     },
@@ -56,13 +56,13 @@ export default {
             this.terrainsLayer = this.amEvent.getMapLayers()['terrainsLayer'].layer;
             this.layersLayer = this.amEvent.getMapLayers()['layersLayer'].layer;
 
-            this.currentMap = 'dx';
+            this.currentMap = 'terrains';
             if (this.amEvent.getDefaultSetting().baseMap.defaultshow === 'images'){
-                this.currentMap = 'yx';
+                this.currentMap = 'imagesLayer';
             } else if (this.amEvent.getDefaultSetting().baseMap.defaultshow === 'terrains'){
-                this.currentMap = 'dx';
+                this.currentMap = 'terrains';
             } else if (this.amEvent.getDefaultSetting().baseMap.defaultshow === 'layers'){
-                this.currentMap = 'dl';
+                this.currentMap = 'layers';
             }
             this.amEvent.setBaseType(this.currentMap);
         },
@@ -71,11 +71,11 @@ export default {
             this.imagesLayer.hide();
             this.terrainsLayer.hide();
             this.layersLayer.hide();
-            if (type === 'dl'){
+            if (type === 'layers'){
                 this.layersLayer.show();
-            } else if (type === 'dx'){
+            } else if (type === 'terrains'){
                 this.terrainsLayer.show();
-            } else if (type === 'yx'){
+            } else if (type === 'imagesLayer'){
                 this.imagesLayer.show();
             }
             this.amEvent.setBaseType(type);
@@ -100,14 +100,7 @@ export default {
     mounted(){
         this.amEvent = new AMEvent(this);
         let that = this;
-        //图层加载比较慢，这里延迟2秒执行，如果延迟2秒还没有获取到那么间隔2秒检查一遍，最多检查4遍
-        that.amEvent.on(EventConst.MAP_INIT_EVENT, function(data){
-            setTimeout(
-                function(){
-                    that.init(data);
-                }
-                ,2000);
-        });
+        that.amEvent.on(EventConst.MAP_INIT_EVENT,this.init);
 
 
     }

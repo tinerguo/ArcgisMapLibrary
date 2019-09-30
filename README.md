@@ -221,3 +221,90 @@ defaultSetting:{
                     ]
                 }
             }
+
+            测站配置：
+            stationLayers:{
+                '雨情站':{
+                    name:'雨情站',
+                    type:'rain',
+                    iconURL:require('ex/assets/map/jsd.png'),
+                    width:24,
+                    height:24,
+                    wkid : 4326,
+                    ParamsDes:{
+                        id:'编号',
+                        name:'名称',
+                        x:'经度',
+                        y:'纬度',
+                        value:'雨量(mm)'
+                    },
+                    list:[
+                        {
+                            id:'001',
+                            name:'测试测站2',
+                            x:'117.395',
+                            y:'39.166',
+                            value:0.4,
+                            value24:22
+                        },
+                        {
+                            id:'002',
+                            name:'测试测站3',
+                            x:'117.13',
+                            y:'39.057',
+                            value:2.44
+                        }
+                    ],
+                    /**
+                     * 地图窗口
+                     * infoTemplate:系统弹出窗口，传递给用户窗口内容ID和测站信息
+                     * custom：系统传递测站信息
+                     * default:系统默认，默认使用infoTemplate展示测站信息列表
+                     */
+                    clickWinType:'default'
+                },
+                '水情站':{
+                    name:'水情站',
+                    type:'water',
+                    width:24,
+                    height:24,
+                    wkid : 4326,
+                    ParamsKey:{
+                        id:'stcd',
+                        name:'stnm',
+                        x:'lgtd',
+                        y:'lttd',
+                        value:'value'
+                    },
+                    ParamsDes:{
+                        stcd:'测站编码',
+                        stnm:'测站名称',
+                        lgtd:'经度',
+                        lttd:'纬度',
+                        value:'水位(m)'
+                    },
+                    list:[
+                        {
+                            stcd:'001',
+                            stnm:'测试测站2',
+                            lgtd:'117.381',
+                            lttd:'39.149',
+                            value:20
+                        },
+                        {
+                            stcd:'002',
+                            stnm:'测试测站3',
+                            lgtd:'117.139',
+                            lttd:'39.071',
+                            value:2.44
+                        }
+                    ],
+                    iconURL:function(value){
+                        if (value > 10){
+                            return require('ex/assets/map/swz2.png');
+                        }
+                        return require('ex/assets/map/swz1.png');
+                    },
+                    clickWinType:'infoTemplate'
+                }
+            },

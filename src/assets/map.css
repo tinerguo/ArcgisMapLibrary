@@ -150,3 +150,6 @@ html{
   min-height: 20px;
   border-radius: 4px;
 }
+.v-modal,.esriSimpleSliderTL{
+  z-index: 21 !important;
+}

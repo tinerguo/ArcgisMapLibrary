@@ -103,7 +103,7 @@ export default {
             this.defaultSetting = this.amEvent.getDefaultSetting();//  this.$ammap.defaultSetting;
             this.map = this.amEvent.getMap(); //this.$ammap.map;
             this.GIS = this.amEvent.getGIS();
-            this.mapLayers = this.amEvent.setMapLayers();
+            this.mapLayers = this.amEvent.getMapLayers();
 
             if (!this.defaultSetting.lend ){
                 this.dynLayers();
@@ -191,12 +191,11 @@ export default {
             let index = this.baseMapList.indexOf('底图');
 
             if (index > -1){
-                console.log();
-                if (this.$ammap.baseType === 'dl'){
+                if (this.amEvent.getBaseType() === 'layers'){
                     this.map.getLayer('layersLayer').show();
-                } else if (this.$ammap.baseType === 'dx'){
+                } else if (this.amEvent.getBaseType() === 'terrains'){
                     this.map.getLayer('terrainsLayer').show();
-                } else if (this.$ammap.baseType === 'yx'){
+                } else if (this.amEvent.getBaseType() === 'imagesLayer'){
                     this.map.getLayer('imagesLayer').show();
                 }
             } else {

@@ -1,11 +1,9 @@
-/* eslint-disable new-cap */
-/* eslint-disable no-undef */
 import { loadCss, loadModules } from 'esri-loader';
 import {TDTMap} from '@/arcgisWiget/mapTitles/TDTMap';
 import {GoogleMap} from '@/arcgisWiget/mapTitles/GoogleMap';
 // import {PopupT} from '@/arcgisWiget/mapPopUpWin/PopupExtended';
 import EventConst,{AMEvent} from '@/config/EventConst';
-import mapLib,{mapLibs} from '@/utils/maplib';
+import {mapLibs} from '@/utils/maplib';
 import {deepObjectMerge} from '@/utils/resolver';
 import {settingTemplate} from '@/config/defaultSetting';
 
@@ -25,41 +23,10 @@ export default {
             mapLayers:{},
             amEvent:{},
             gisModules: [
-                'esri/map',
-                'esri/dijit/OverviewMap',
-                'esri/geometry/webMercatorUtils',
-                'esri/toolbars/navigation',
-                'esri/dijit/Measurement',
-                'esri/units',
-                'esri/layers/TiledMapServiceLayer',
-                'esri/layers/ArcGISDynamicMapServiceLayer',
-                'esri/SpatialReference',
-                'esri/geometry/Extent',
-                'esri/layers/TileInfo',
-                'esri/geometry/Point',
-                'esri/geometry/Circle',
-                'esri/geometry/Polygon',
-                'esri/symbols/SimpleFillSymbol',
-                'esri/graphic',
-                'esri/layers/GraphicsLayer',
-                'esri/tasks/IdentifyTask',
-                'esri/tasks/IdentifyParameters',
-                'esri/layers/FeatureLayer',
-                'esri/symbols/PictureMarkerSymbol',
-                'esri/symbols/SimpleLineSymbol',
-                'esri/renderers/SimpleRenderer',
-                'esri/toolbars/draw',
-                'esri/tasks/FindTask',
-                'esri/tasks/FindParameters',
-                'esri/geometry/webMercatorUtils',
-                'esri/InfoTemplate',
-                'ncam/PopupExtended',
-                'esri/dijit/PopupTemplate',
-                'esri/symbols/SimpleMarkerSymbol'
+
             ],
             mapOrderNum:0,
             mapLibs:{},
-            shadeGraphicsLayer:{},
             defaultSetting:{}
         };
     },
@@ -142,7 +109,7 @@ export default {
                 extended: {
                     themeClass: 'light',
                     draggable: true,
-                    defaultWidth: 250,
+                    defaultWidth: this.defaultSetting.popupDefaultWdith,
                     /**
                     defaultWidth: 750,
                     actions: [{
@@ -169,11 +136,11 @@ export default {
             extendedPopup.setMap(this.map);
             this.map.infoWindow = extendedPopup;
 
-            if (this.defaultSetting.baseMap.visibility){
-                this.initBaseMap();
-            }
+            // if (this.defaultSetting.baseMap.visibility){
+            this.initBaseMap();
+            // }
             // this.$ammap.$emit(EventConst.MAP_INIT_EVENT);
-            this.amEvent.emit(EventConst.MAP_INIT_EVENT,{});
+
         },
         /**
          * 初始化基础底图
@@ -281,11 +248,15 @@ export default {
                 order:this.mapOrderNum
             }, true);
 
+            this.amEvent.emit(EventConst.MAP_INIT_EVENT,{});
+
         },
         /**
          * 专题图
          */
         loadSpecialLayers(){
+
+
             for (let i =0;i<this.defaultSetting.dynamicLayers.length;i++){
                 let tempObj = this.defaultSetting.dynamicLayers[i];
                 let tempDynamicLayer = new this.GIS.ArcGISDynamicMapServiceLayer(tempObj.url,
@@ -294,10 +265,10 @@ export default {
                 this.addMapLayer(tempObj.id, {
                     layer: tempDynamicLayer,
                     order:this.mapOrderNum
-                }, true);
+                }, tempObj.visibility);
 
 
-                // eslint-disable-next-line no-loop-func
+                // eslint-disable-next-line no-shadow
                 (function(tempObj,tempDynamicLayer){
                     dojo.connect(tempDynamicLayer, 'onLoad', function (layers) {
                         layers.setVisibleLayers(tempObj.show);
@@ -308,33 +279,27 @@ export default {
             /**
              * 创建geoJSON
              * */
-            let geojsonGraphicsLayer = new this.GIS.GraphicsLayer('geojsonGraphicsLayer');
-            this.addMapLayer('geojsonGraphicsLayer', {
-                layer: geojsonGraphicsLayer,
-                order:this.mapOrderNum
-            }, true);
 
             for (let j =0;j<this.defaultSetting.geojson.length;j++){
                 let tempObj = this.defaultSetting.geojson[j];
-                // geojsonGraphicsLayer.add(mapLib.ondrawplaneLocator(
-                //     this.GIS,
-                //     tempObj.paths,
-                //     this.map.spatialReference.wkid,
-                //     tempObj.fillColor,
-                //     tempObj.lineWidth,
-                //     tempObj.lineColor
-                // ));
+                let geojsonGraphicsLayer = new this.GIS.GraphicsLayer(tempObj.id);
+                this.addMapLayer(tempObj.id, {
+                    layer: geojsonGraphicsLayer,
+                    order:this.mapOrderNum
+                }, tempObj.visibility);
+
                 try {
-                    geojsonGraphicsLayer.add(this.apiDrowGeoJsonPolygon(
+                    this.apiDrowGeoJsonPolygon(
                         tempObj.geoJSON,
                         tempObj.fillColor,
                         tempObj.lineWidth,
-                        tempObj.lineColor));
-                } catch (e){}
-
-
+                        tempObj.lineColor,
+                        tempObj.id
+                    );
+                } catch (e){
+                    console.error('绘制geojson错误',e);
+                }
             }
-
             /**
              * 创建临时图层
              * */
@@ -343,6 +308,7 @@ export default {
                 layer: tempGraphicsLayer,
                 order:this.mapOrderNum
             }, true);
+
 
         },
 
@@ -431,47 +397,118 @@ export default {
             }
         },
         /**
+         * 测站
+         * @param {*} stations
+         */
+        apiCenterStatioin(obj){
+            //事件源页面对象
+            let pageThis = obj.page;
+            //地图测站数据
+            let data = obj.data;
+
+            this.map.infoWindow.closeAll();
+
+            let stationObj = this.amEvent.getStations();
+            let graphic = stationObj[
+                data.nameParam['layerType']+'_'+
+              data[data.nameParam.id]
+            ];
+
+            this.map.centerAt(graphic.geometry);
+
+            if (data.nameParam.clickWinType === 'infoTemplate'){//自定义infoTemplate窗口内容
+
+                let id = this.mapLibs.createInfoTemplate(graphic,'infoTemplate');
+                this.map.infoWindow.setFeatures([graphic]);
+                this.map.infoWindow.show(graphic.geometry);
+                //发送事件
+                pageThis.$emit('mapClick',data,id);
+
+            } else if (data.nameParam.clickWinType === 'custom'){//自定义窗口
+                //发送事件
+                pageThis.$emit('mapClick',data);
+
+            } else if (data.nameParam.clickWinType === 'default'){//系统默认窗口和内容
+
+                this.mapLibs.createInfoTemplate(graphic,'default');
+                this.map.infoWindow.setFeatures([graphic]);
+                this.map.infoWindow.show(graphic.geometry);
+
+            }
+        },
+        /**
          * 清空地图
          */
         apiMapClear(){
             this.mapLayers['tempLayer'].layer.clear();
         },
-        apiDrowGeoJsonPolygon(ringsObj,fillColor,lineWidth,lineColor){
+        apiDrowGeoJsonPolygon(ringsObj,fillColor,lineWidth,lineColor,layerNM){
+            if (!fillColor){
+                fillColor = ringsObj['fillColor'];
+                lineWidth =ringsObj['lineWidth'];
+                lineColor = ringsObj['lineColor'];
+                ringsObj = ringsObj['mapJSONObj'];
+                layerNM = ringsObj['layerNM'];
+            }
             try {
-                if (!this.shadeGraphicsLayer.id){
-                    this.shadeGraphicsLayer = this.addMapLayer('shadetttGraphicsLayer', {
-                        layer: new this.GIS.GraphicsLayer('shadetttGraphicsLayer'),
-                        order:0
-                    }, true);
+                let tempLayer = {};
+                if (!layerNM){
+                    tempLayer = this.mapLayers['tempLayer'].layer;
+                } else {
+                    tempLayer = this.mapLayers[layerNM].layer;
                 }
 
                 for (let j =0;j<ringsObj.features.length;j++){
+                    let properties = ringsObj.features[j].properties || {};
                     let paths = ringsObj.features[j].geometry.coordinates;
                     for (let i =0;i<paths.length;i++){
                         if (ringsObj.features[j].geometry.type === 'MultiPolygon'){
                             for (let q =0;q<paths[i].length;q++){
                                 let temprings = paths[i][q];
-                                this.shadeGraphicsLayer.add(
+                                tempLayer.add(
                                     this.mapLibs.drowGeoJsonPolygon( temprings,
                                         this.map.spatialReference.wkid,
-                                        fillColor,
-                                        lineWidth,lineColor)
+                                        properties.backcolor || fillColor ,
+                                        properties.layerLineWidth || lineWidth,
+                                        properties.linecolor || lineColor)
                                 );
                             }
                         } else if (ringsObj.features[j].geometry.type === 'Polygon'){
-                            this.shadeGraphicsLayer.add(
+                            tempLayer.add(
                                 this.mapLibs.drowGeoJsonPolygon( paths[i],
                                     this.map.spatialReference.wkid,
-                                    fillColor,
-                                    lineWidth,lineColor)
+                                    properties.backcolor || fillColor,
+                                    properties.layerLineWidth || lineWidth,
+                                    properties.linecolor || lineColor)
                             );
+                        } else if (ringsObj.features[j].geometry.type === 'MultiPoint'){
+
+                            //ringsObj.features[j].geometry.coordinates;
+                            for (let q =0;q<paths[i].points.length;q++){
+                                let temppoints = paths[i].points[q];
+                                tempLayer.add(
+                                    this.mapLibs.drowGeoJsonPoint( temppoints,
+                                        this.map.spatialReference.wkid,
+                                        properties.backcolor || fillColor ,
+                                        properties.layerLineWidth || lineWidth,
+                                        properties.linecolor || lineColor)
+                                );
+
+
+                            }
+
                         }
                     }
                 }
-            } catch (e){}
+            } catch (e){
+                console.error('绘制geojson错误1',e);
+            }
         },
         apiGetConfigAll(){
 
+
+        },
+        apiMapStatusChange(data){
 
         }
     },
@@ -482,9 +519,47 @@ export default {
 
         //合并配置信息，缺省的属性补齐
         this.defaultSetting = deepObjectMerge(this.config,settingTemplate);
+
+        //判断是否有状态参数
+        if (this.defaultSetting.defaultMapState && this.defaultSetting.mapStateList.length > 0){
+            //获取默认状态对象
+            let currentStatusObj = this.defaultSetting.mapStateList.find((item)=>item.id === this.defaultSetting.defaultMapState );
+            //如果状态对象存在
+            if (currentStatusObj){
+                //设置默认基础地图
+                if (currentStatusObj.baseMap) {
+                    this.defaultSetting['baseMap'].defaultshow = currentStatusObj.baseMap;
+                }
+                //设置动态图层
+                if (currentStatusObj.dynamicLayers){
+                    for (let i =0;i<this.defaultSetting.dynamicLayers.length;i++){
+                        let dynamicLayerObj = this.defaultSetting.dynamicLayers[i];
+                        let id = dynamicLayerObj.id;
+                        if (currentStatusObj.dynamicLayers[id]){
+                            this.defaultSetting.dynamicLayers[i].show = currentStatusObj.dynamicLayers[id].show;
+                            this.defaultSetting.dynamicLayers[i].visibility = currentStatusObj.dynamicLayers[id].visibility;
+                        } else {
+                            this.defaultSetting.dynamicLayers[i].visibility = false;
+                        }
+                    }
+                }
+                //设置geojson
+                if (currentStatusObj.geojson){
+                    for (let i =0;i<this.defaultSetting.geojson.length;i++){
+                        let tempObj = this.defaultSetting.geojson[i];
+                        //如果数组中存在那么现实
+                        if (currentStatusObj.geojson.findIndex(item=>item === tempObj.id) > -1){
+                            this.defaultSetting.geojson[i].visibility = true;
+                        } else {
+                            this.defaultSetting.geojson[i].visibility = false;
+                        }
+                    }
+                }
+            }
+        }
         //设置全局参数
         this.amEvent.setDefaultSetting(this.defaultSetting);
-
+        this.gisModules = this.defaultSetting.gisModules;
         if (this.$ammap.GIS.map){
             this.GIS = this.$ammap.GIS;
             this.initMap();
@@ -498,13 +573,12 @@ export default {
         this.amEvent.on(EventConst.MAP_CLEAR,this.apiMapClear);
         //监听地图定位 支持面、点和线
         this.amEvent.on(EventConst.MAP_CENTER,this.apiCenterPoint);
-        // let t1 = {'kafa':['1'],'name':{'n1':'22',n2:'33'},'age':'tiner','home':{'1':'333','2':{'cici':'7'},'3':['1','2']}};
-        // let t3 = {'kafa':{},'name':{'n1':'1111',n2:'33111'},'home':{'1':'333','3':['3','4']}};
-        // console.log(deepObjectMerge(t1,t3));
-
-        // import {deepObjectMerge} from '@/utils/resolver';
-        // import {defaultSetting} from '@/config/defaultSetting';
-
+        //地图绘制GeoJSON
+        this.amEvent.on(EventConst.MAP_DROWGEOJSONPOLYGON,this.apiDrowGeoJsonPolygon);
+        //地图测站定位
+        this.amEvent.on(EventConst.MAP_CENTER_STATION,this.apiCenterStatioin);
+        //设置地图状态
+        this.amEvent.on(EventConst.MAP_STATUS_CHANGE,this.apiMapStatusChange);
 
     }
 };

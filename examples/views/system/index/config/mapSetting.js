@@ -1,16 +1,26 @@
-import {xd,xx} from './geoJSON';
+import {xd,xx,zg} from './geoJSON';
 export let defaultSetting = {
     debugger:true,
     x:117.38984,
     y:39.14688,
-    level:5,
+    level:6,
+    baseMap:{
+        visibility:true,
+        type:'tdt',//谷歌地图:google,天地图:tdt
+        defaultshow:'terrains',//影像图:images,地形图:terrains,矢量图:layers
+        labelLayerVisibility:true,//地图标注
+        shadeLayer:{
+            visibility:true,
+            opacity:0.5
+        }
+    },
     /** 动态图层 */
     dynamicLayers:[
         {
             name:'静海图层',
             id:'DLbackalllayer',
             url:'http://111.30.103.114:6080/arcgis/rest/services/DongLiMapFlood/MapServer',
-            show:[0,1,2,3,4,5,6,7,9,10],//默认显示
+            show:[0],//默认显示 ,1,2,3,4,5,6,7,9,10
             layers:{//图例显示对于名称
                 0:'险工',
                 1:'险段',
@@ -36,13 +46,14 @@ export let defaultSetting = {
                     }
                 },
                 textSearchParams:['NAME','Shape','GB','ANGLE','ORIG_FID']
-            }
+            },
+            visibility:true
         },
         {
             name:'东丽图层',
             id:'NHBackalllayer',
             url:'http://111.30.97.35:8099/arcgis/rest/services/NHMAP/MapServer',
-            show:[0,1,2,3,4,5,6,7,8],
+            show:[0],//,1,2,3,4,5,6,7,8
             layers:{
                 0:'二级河道new',
                 1:'一级河道',
@@ -66,80 +77,68 @@ export let defaultSetting = {
                     }
                 },
                 textSearchParams:['NAME','Shape','GB','ANGLE','ORIG_FID']
-            }
+            },
+            visibility:true
         }
     ],
     /** geojson 图层 */
     geojson:[
         {
             id:'drowplane1Layer',
-            geoJSON:xx,
-            fillColor:[255,33,22,0.3],//背景颜色
+            geoJSON:zg,
+            fillColor:[255,33,22,0],//背景颜色
             lineWidth:4,//边界宽度
-            lineColor:[255,33,0,0.5]//边界颜色
+            lineColor:[255,33,0,0.5],//边界颜色
+            visibility:true
         },
         {
             id:'drowplane2Layer',
-            geoJSON:xd,
+            geoJSON:xx,
             fillColor:[255,33,22,0.3],//背景颜色
-            lineWidth:1,//边界宽度
-            lineColor:[0,0,0,1]//边界颜色
+            lineWidth:2,//边界宽度
+            lineColor:[255,33,0,0.5],//边界颜色
+            visibility:true
         }
     ],
-    baseMap:{
-        visibility:true,
-        type:'tdt',//谷歌地图:google,天地图:tdt
-        defaultshow:'terrains',//影像图:images,地形图:terrains,矢量图:layers
-        labelLayerVisibility:true,//地图标注
-        shadeLayer:{
-            visibility:true,
-            opacity:0.5
-        }
-    },
     lend:{
         shadeLayerVisibility:false,
         labelsLayerVisibility:false
     },
     type:{
         dynamicLayers:{
-
         }
-    }
+    },
+    defaultMapState:'rainState',
+    mapStateList:[
+        {
+            station:['rain'],
+            dynamicLayers:{
+                'DLbackalllayer':{
+                    show:[0,1,2,3,4,5,6,7,9,10],
+                    visibility:true
+                },
+                'NHBackalllayer':{
+                    show:[0,1,2,3,4,5,6,7,8],
+                    visibility:true
+                }
+            },
+            baseMap:'images',
+            geojson:['drowplane2Layer'],
+            name:'雨情监测',
+            id:'rainState'
+        },
+        {
+            station:['water'],
+            dynamicLayers:{
+                'NHBackalllayer':{
+                    show:[]
+                }
+            },
+            geojson:['drowplane1Layer'],
+            baseMap:'terrains',
+            name:'水情监测',
+            id:'waterState'
+        }
+    ]
 };
 
-
-/**
-           * 分组类型：
-           *  系统提供三种分组,custom,layers,all
-           * custom:自定义分组规则，可以安装个人喜好高度定制
-           * layers：按照动态图层进行排序，一个图层是一个组
-           * all:所有图层分到一个组中
-           */
-
-
-/**
-        dynLayers:{
-            isGroup:true,//是否分组
-
-            groupType:'',
-            group:[
-                {
-                    name:'静海图层',
-                    ids:[{
-                        layerid:'DLbackalllayer',
-                        ledid:0
-                    }]
-                },
-                {
-                    name:'宁河图层',
-                    ids:[{
-                        layerid:'DLbackalllayer',
-                        ledid:0
-                    }
-                    ]
-                }
-            ]
-        },
-        stations:[
-        ]
-         */

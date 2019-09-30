@@ -3,10 +3,21 @@
     <div class="mapMouseOverDiv popupwin" :style="getmapMouseOverDivStyle">
         <slot name="overDiv">
                 <table class="popupwinTable">
-                  <tr v-if="mapMouseOver.currentObj.ParamsDes[i]" v-for="(key,i) in mapMouseOver.currentObj" :key="i">
-                    <th>{{mapMouseOver.currentObj.ParamsDes[i]}}:</th>
-                    <td>{{key}}</td>
-                  </tr>
+
+                  <template v-if="mapMouseOver.currentObj.ParamsDes != undefined">
+                    <tr v-if="mapMouseOver.currentObj.ParamsDes[i]" v-for="(key,i) in mapMouseOver.currentObj" :key="i">
+                      <th>{{mapMouseOver.currentObj.ParamsDes[i] == undefined ?'':mapMouseOver.currentObj.ParamsDes[i]}}:</th>
+                      <td>{{key}}</td>
+                    </tr>
+                  </template>
+
+                  <template v-if="mapMouseOver.currentObj.ParamsDes == undefined">
+                    <tr v-if="(i != 'ParamsKey') && (i != 'ParamsDes') && (i != 'nameParam')" v-for="(key,i) in mapMouseOver.currentObj" :key="i">
+                      <th>{{i}}</th>
+                      <th>{{key}}</th>
+                    </tr>
+                  </template>
+
                 </table>
         </slot>
     </div>
@@ -15,12 +26,16 @@
 
 <script>
 import EventConst,{AMEvent} from '@/config/EventConst';
-import mapLib from '@/utils/maplib';
+import {mapLibs} from '@/utils/maplib';
 export default {
     props: {
         mdata: {
             type: Object,
             default: () => {}
+        },
+        visibility: {
+            type: Boolean,
+            default: true
         }
     },
     data () {
@@ -35,7 +50,8 @@ export default {
                 x:100000,
                 y:0,
                 currentObj:{}
-            }
+            },
+            mapLibs:{}
         };
     },
     components: {
@@ -53,6 +69,7 @@ export default {
             this.map = this.amEvent.getMap();
             this.GIS = this.$ammap.GIS;
             this.defaultSetting = this.amEvent.getDefaultSetting();
+            this.mapLayers = this.amEvent.getMapLayers();
             this.createLayers();
         },
         /**
@@ -61,26 +78,13 @@ export default {
         createLayers(){
             let tempObj = this.mdata;
             let layerNM = tempObj.type+'layer';
-            // if (!this.mapLayers[layerNM]){
-            //     layerArr.push({
-            //         id:layerNM,
-            //         name:tempObj.name,
-            //         visibility:true
-            //     });
-            //     this.$ammap.stationsLayers.push({
-            //         id:layerNM,
-            //         name:tempObj.name,
-            //         visibility:true
-            //     });
-            // }
-
             this.eventToken = Math.random();
             //添加图层
             this.amEvent.emit(EventConst.MAP_ADD_LAYER,{
                 layer:{
                     id:layerNM,//图层ID
                     name:tempObj.name,//图层名称
-                    visibility:true
+                    visibility:this.visibility
                 },
                 eventToken:this.eventToken
             });
@@ -97,7 +101,7 @@ export default {
             if (!layer){
                 return;
             }
-            mapLib.ondrawPointLocator(this,this.GIS,this.amEvent.getMap(),layer.layer,
+            this.mapLibs.ondrawPointLocator(this,this.GIS,this.amEvent.getMap(),layer.layer,
                 tempObj.type,
                 tempObj.list,
                 tempObj.iconURL,
@@ -106,13 +110,21 @@ export default {
                 tempObj.ParamsDes,
                 tempObj.ParamsKey
             );
+        },
+        apiCenterStatioin(data){
+            this.amEvent.emit(EventConst.MAP_CENTER_STATION,{
+                page:this,
+                data:data
+            });
         }
     },
     mounted () {
+        this.mapLibs = new mapLibs(this);
         this.amEvent = new AMEvent(this);
+        //地图初始化
         this.amEvent.on(EventConst.MAP_INIT_EVENT,this.init);
+        //地图图层加载完成（一个组件创建一个图层）
         this.amEvent.on(EventConst.MAP_ADD_LAYER_SUCCESS,this.drowmap);
-
     }
 };
 </script>

@@ -73,7 +73,7 @@
 
       <div v-if="winType == 'bottom'" v-show="leftWinVis" class="searchResultWin bottom">
         <div class="title">
-          bottom图层列表
+          图层列表
         </div>
         <div class="windCloseBtn" @click="closeLeftWin">
           <mapFont name="iconguanbi"></mapFont>
@@ -192,7 +192,8 @@ export default {
                 stations:[]
             },
             mapExtentChange:null,
-            buttonState:true
+            buttonState:true,
+            timer:null
         };
     },
     computed:{
@@ -223,7 +224,7 @@ export default {
                 return;
             }
             this.drowMapActive = true;
-            this.drawToolbar = new this.GIS.draw(this.map);
+            this.drawToolbar = new this.$ammap.GIS.draw(this.map);
             this.drawToolbar.on('draw-end',this.showResults);
             this.map.setMapCursor('pointer');
             this.drawToolbar.activate(this.GIS.draw.EXTENT);
@@ -387,16 +388,8 @@ export default {
     mounted(){
         this.scrollInit();
         this.amEvent = new AMEvent(this);
-
         let that = this;
-        //图层加载比较慢，这里延迟2秒执行，如果延迟2秒还没有获取到那么间隔2秒检查一遍，最多检查4遍
-        that.amEvent.on(EventConst.MAP_INIT_EVENT, function(data){
-            setTimeout(
-                function(){
-                    that.init(data);
-                }
-                ,2000);
-        });
+        that.amEvent.on(EventConst.MAP_INIT_EVENT, this.init);
     }
 };
 </script>
@@ -461,7 +454,7 @@ export default {
     line-height: 32px;
     border-radius: 4px;
     border:1px solid #333;
-    background: #fff;
+    background: rgba(255,255,255,0.6);;
     z-index: 20;
     padding:4px 10px;
     display: flex;
@@ -470,7 +463,7 @@ export default {
   .iconBtn{
     cursor: pointer;
     padding:0px 20px;
-    border:1px solid #333;
+    border:1px solid #929292;
     border-radius: 4px;
     color:#0089c9;
     display: inline-block;

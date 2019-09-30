@@ -46,6 +46,14 @@ const frameIn = [
                     auth: true
                 },
                 component: _import('system/drowmap')
+            },
+            {
+                path: 'stations',
+                name: 'stations',
+                meta: {
+                    auth: true
+                },
+                component: _import('system/stations')
             }
         ]
     }

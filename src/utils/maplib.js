@@ -1,115 +1,7 @@
 /* eslint-disable no-invalid-this */
 /* eslint-disable no-undef */
 //todo:根据坐标list地图绘制面
-function ondrawplaneLocator(GIS,rings, wkid, fillColor, lineWidth, lineColor, lineStyle) {
 
-    lineStyle = lineStyle || esri.symbol.SimpleLineSymbol.STYLE_SOLID;
-    var polygon = new GIS.Polygon(new GIS.SpatialReference({wkid:wkid}));
-    polygon.addRing(rings);
-    let polygonsymbol;
-
-    if (lineWidth === 0) {
-        polygonsymbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, null, new dojo.Color(fillColor));
-    } else {
-        polygonsymbol = new esri.symbol.SimpleFillSymbol(
-            esri.symbol.SimpleFillSymbol.STYLE_SOLID,
-            new esri.symbol.SimpleLineSymbol(lineStyle,
-                new dojo.Color(lineColor), lineWidth),
-            new dojo.Color(fillColor));
-    }
-    let graphic = new GIS.graphic(polygon, polygonsymbol);
-    return graphic;
-}
-//绘制测站数据
-function ondrawPointLocator(page,GIS,map,layer,type,arr,iconUrl,iconW,iconH,ParamsDes,ParamsKey){
-    var amEvent = page.amEvent;
-    let nameParam = ParamsKey || {
-        id:'id',
-        name:'name',
-        x:'x',
-        y:'y',
-        value:'value'
-    };
-    let that = this;
-
-    for (let i = 0; i < arr.length; i++) {
-        let pointObj = arr[i];
-        pointObj.ParamsKey = ParamsKey;
-        pointObj.nameParam = nameParam;
-        if (ParamsDes){
-            pointObj.ParamsDes = ParamsDes;
-        }
-        let geometry = new GIS.Point(pointObj[nameParam.x], pointObj[nameParam.y]);
-        let picURL = '';
-        if (typeof iconUrl === 'function'){
-            picURL = iconUrl(pointObj[nameParam.value]);
-        } else {
-            picURL = iconUrl;
-        }
-
-
-        let picSymbol = new GIS.PictureMarkerSymbol(picURL, iconW, iconH);
-        // eslint-disable-next-line new-cap
-        //,infoTemplate
-        let picGraphic = new GIS.graphic(geometry, picSymbol, pointObj);
-        layer.add(picGraphic);
-        amEvent.setStations(type+'_'+pointObj[nameParam['id']],picGraphic);
-        // let loc = map.toScreen(picGraphic.geometry);
-        // map.infoWindow.setFeatures([picGraphic]);
-        // map.infoWindow.show(loc);
-    }
-
-    dojo.connect(layer, 'onMouseMove', function(evt) {
-        var g = evt.graphic;
-        var point = map.toScreen(g.geometry);
-        map.setMapCursor('pointer');
-        page.mapMouseOver.x = point.x+10;
-        page.mapMouseOver.y = point.y+10;
-        page.mapMouseOver.currentObj = g.attributes;
-        page.$emit('mapMove',g.attributes);
-    });
-    dojo.connect(layer, 'onMouseOut', function() {
-        var timer = setTimeout(function(){
-            page.mapMouseOver.x = 10000;
-            clearTimeout(timer);
-            timer = null;
-            map.setMapCursor('default');
-        },300);
-    });
-    dojo.connect(layer, 'onClick', function (evt) {
-        var graphic = evt.graphic;
-
-
-        if (page.mdata.clickWinType === 'custom'){
-            page.$emit('mapClick',graphic.attributes);
-        } else if (page.mdata.clickWinType === 'infoTemplate'){
-            let num = sum(1,1000);
-            let infoTemplate = new GIS.InfoTemplate('${'+nameParam['name']+'}','<div class="yq_win'+num+'"></div>');
-            graphic.setInfoTemplate(infoTemplate);
-            page.$emit('mapClick',graphic.attributes,'yq_win'+num
-            );
-        } else {
-            let ParamsDes = graphic.attributes.ParamsDes;
-            let content = '<table>';
-            for (let key in graphic.attributes){
-                if (key === 'paramsSetting'){
-                    continue;
-                }
-                if (ParamsDes){
-                    if (!ParamsDes[key]){
-                        continue;
-                    }
-                    content += '<tr><th>'+ParamsDes[key]+'</th><td>'+graphic.attributes[key]+'</td></tr>';
-                } else {
-                    content += '<tr><th>'+key+'</th><td>'+graphic.attributes[key]+'</td></tr>';
-                }
-            }
-            content += '</table>';
-            graphic.setInfoTemplate(new GIS.InfoTemplate('${'+nameParam['name']+'}','<div class="popupwin yq_win'+sum(1,1000)+'">'+content+'</div>'));
-        }
-    });
-
-}
 function sum (m,n){
     var num = Math.floor(Math.random()*(m - n) + n);
     return num;
@@ -127,9 +19,137 @@ export function mapLibs(page){
 }
 
 mapLibs.prototype = {
+    ondrawplaneLocator(GIS,rings, wkid, fillColor, lineWidth, lineColor, lineStyle) {
+
+        lineStyle = lineStyle || esri.symbol.SimpleLineSymbol.STYLE_SOLID;
+        var polygon = new GIS.Polygon(new GIS.SpatialReference({wkid:wkid}));
+        polygon.addRing(rings);
+        let polygonsymbol;
+
+        if (lineWidth === 0) {
+            polygonsymbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, null, new dojo.Color(fillColor));
+        } else {
+            polygonsymbol = new esri.symbol.SimpleFillSymbol(
+                esri.symbol.SimpleFillSymbol.STYLE_SOLID,
+                new esri.symbol.SimpleLineSymbol(lineStyle,
+                    new dojo.Color(lineColor), lineWidth),
+                new dojo.Color(fillColor));
+        }
+        let graphic = new GIS.graphic(polygon, polygonsymbol);
+        return graphic;
+    },
+    ondrawPointLocator(page,GIS,map,layer,type,arr,iconUrl,iconW,iconH,ParamsDes,ParamsKey){
+        var amEvent = page.amEvent;
+
+        let nameParam = ParamsKey || {
+            id:'id',
+            name:'name',
+            x:'x',
+            y:'y',
+            value:'value'
+        };
+        nameParam['clickWinType'] = page.mdata.clickWinType;
+        nameParam['layerType'] = page.mdata.type;
+
+        let that = this;
+        for (let i = 0; i < arr.length; i++) {
+            let pointObj = arr[i];
+
+            pointObj.ParamsKey = ParamsKey;
+            pointObj.nameParam = nameParam;
+            if (ParamsDes){
+                pointObj.ParamsDes = ParamsDes;
+            }
+            let geometry = new GIS.Point(pointObj[nameParam.x], pointObj[nameParam.y]);
+            let picURL = '';
+            if (typeof iconUrl === 'function'){
+                picURL = iconUrl(pointObj[nameParam.value]);
+            } else if (typeof iconUrl === 'string'){
+                picURL = iconUrl;
+            } else {
+                picURL = require('@/components/stationLayers/images/default_station.png');
+            }
+
+
+            let picSymbol = new GIS.PictureMarkerSymbol(picURL, iconW, iconH);
+            // eslint-disable-next-line new-cap
+            //,infoTemplate
+            let picGraphic = new GIS.graphic(geometry, picSymbol, pointObj);
+            layer.add(picGraphic);
+            amEvent.setStations(type+'_'+pointObj[nameParam['id']],picGraphic);
+        // let loc = map.toScreen(picGraphic.geometry);
+        // map.infoWindow.setFeatures([picGraphic]);
+        // map.infoWindow.show(loc);
+        }
+
+        dojo.connect(layer, 'onMouseMove', function(evt) {
+            var g = evt.graphic;
+            var point = map.toScreen(g.geometry);
+            map.setMapCursor('pointer');
+            page.mapMouseOver.x = point.x+10;
+            page.mapMouseOver.y = point.y+10;
+            page.mapMouseOver.currentObj = g.attributes;
+            page.$emit('mapMove',g.attributes);
+        });
+        dojo.connect(layer, 'onMouseOut', function() {
+            var timer = setTimeout(function(){
+                page.mapMouseOver.x = 10000;
+                clearTimeout(timer);
+                timer = null;
+                map.setMapCursor('default');
+            },300);
+        });
+        dojo.connect(layer, 'onClick', function (evt) {
+            var graphic = evt.graphic;
+            if (page.mdata.clickWinType === 'custom'){
+                page.$emit('mapClick',graphic.attributes);
+            } else if (page.mdata.clickWinType === 'infoTemplate'){
+                let num = sum(1,1000);
+                let infoTemplate = new GIS.InfoTemplate('${'+nameParam['name']+'}','<div id="yq_win'+num+'"></div>');
+                graphic.setInfoTemplate(infoTemplate);
+                page.$emit('mapClick',graphic.attributes,'yq_win'+num);
+                map.infoWindow.setFeatures([graphic]);
+                map.infoWindow.show(graphic.geometry);
+
+            } else {
+                map.infoWindow.setFeatures([graphic]);
+                map.infoWindow.show(graphic.geometry);
+            }
+        });
+    },
+
+    createInfoTemplate(graphic,type){
+        var nameParam = graphic.attributes;
+        if (type === 'infoTemplate'){
+            let num = sum(1,1000);
+            let infoTemplate = new this.GIS.InfoTemplate('${'+nameParam['name']+'}','<div id="yq_win'+num+'"></div>');
+            graphic.setInfoTemplate(infoTemplate);
+            return 'yq_win'+num;
+        } else if (type === 'default'){
+            let ParamsDes = graphic.attributes.ParamsDes;
+            let content = '<table>';
+            for (let key in graphic.attributes){
+                if (key === 'paramsSetting' ||
+                      key === 'ParamsKey' ||
+                      key === 'nameParam'){
+                    continue;
+                }
+                if (ParamsDes){
+                    if (!ParamsDes[key]){
+                        continue;
+                    }
+                    content += '<tr><th>'+ParamsDes[key]+'</th><td>'+graphic.attributes[key]+'</td></tr>';
+                } else {
+                    content += '<tr><th>'+key+'</th><td>'+graphic.attributes[key]+'</td></tr>';
+                }
+            }
+            content += '</table>';
+            graphic.setInfoTemplate(new this.GIS.InfoTemplate('${'+nameParam['name']+'}','<div class="popupwin yq_win'+sum(1,1000)+'">'+content+'</div>'));
+        }
+    },
     drowGeoJsonPolygon(rings, wkid, fillColor, lineWidth, lineColor, lineStyle){
         lineStyle = lineStyle || esri.symbol.SimpleLineSymbol.STYLE_SOLID;
-        var polygon = new this.GIS.Polygon(new this.GIS.SpatialReference({wkid:wkid}));
+        let polygon = new this.GIS.Polygon(new this.GIS.SpatialReference({wkid:wkid}));
         polygon.addRing(rings);
         let polygonsymbol;
 
@@ -143,6 +163,22 @@ mapLibs.prototype = {
                 new dojo.Color(fillColor));
         }
         let graphic = new this.GIS.graphic(polygon, polygonsymbol);
+        return graphic;
+    },
+    drowGeoJsonPoint(rings, wkid, fillColor, lineWidth, lineColor, lineStyle){
+        lineStyle = lineStyle || esri.symbol.SimpleLineSymbol.STYLE_SOLID;
+        var polygon = new this.GIS.Point(rings[0],rings[1],new this.GIS.SpatialReference({wkid:wkid}));
+
+        let pointsymbol = new this.GIS.SimpleMarkerSymbol(
+            esri.symbol.SimpleLineSymbol.STYLE_SOLID,//style
+            18,//size
+            new this.GIS.SimpleLineSymbol(//outline
+                lineStyle,
+                new dojo.Color(lineColor),
+                lineWidth),
+            new dojo.Color(fillColor));//color
+
+        let graphic = new this.GIS.graphic(polygon, pointsymbol);
         return graphic;
     },
     /**
@@ -346,7 +382,6 @@ mapLibs.prototype = {
         let locationGraphic = new this.GIS.graphic(feature.geometry, symbol,{},infoTemplate);
         this.page.mapLayers['tempLayer'].layer.add(locationGraphic);
 
-
         this.map.infoWindow.closeAll();
         this.map.infoWindow.setFeatures([locationGraphic]);
         this.map.infoWindow.show(feature.geometry);
@@ -354,8 +389,6 @@ mapLibs.prototype = {
 };
 
 export default {
-    ondrawplaneLocator,
-    ondrawPointLocator,
     mapLibs
 };
 

@@ -18,11 +18,11 @@
           <router-link :to="{ name: 'win'}" tag="li">
             <a>地图窗口</a>
           </router-link>
+          <router-link :to="{ name: 'stations'}" tag="li">
+            <a>测站绘制</a>
+          </router-link>
           <li>
             <a style="text-decoration:line-through;">底图校准</a>
-          </li>
-          <li>
-            <a  style="text-decoration:line-through;">测站绘制</a>
           </li>
           <li>
             <a  style="text-decoration:line-through;">地图在线编辑</a>

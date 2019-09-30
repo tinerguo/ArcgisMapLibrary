@@ -5,6 +5,7 @@ export const settingTemplate = {
     x:117.38984,
     y:39.14688,
     level:9,
+    popupDefaultWdith:250,
     dynamicLayers:[
     ],
     geojson:[
@@ -55,7 +56,8 @@ export const settingTemplate = {
         'esri/InfoTemplate',
         'ncam/PopupExtended',
         'esri/dijit/PopupTemplate',
-        'esri/symbols/SimpleMarkerSymbol'
+        'esri/symbols/SimpleMarkerSymbol',
+        'esri/symbols/CartographicLineSymbol'
     ]
 };
 

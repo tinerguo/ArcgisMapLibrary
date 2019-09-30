@@ -16,6 +16,7 @@ import router from './router';
 import Element from 'element-ui';
 Vue.use(Element, { size: 'small' });
 
+require('ex/mock/index.js');
 
 Vue.use(AMMap);
 
