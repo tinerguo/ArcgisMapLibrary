@@ -45,6 +45,7 @@ export default {
             amEvent:{},
             defaultSetting:{},
             mapLayers:{},
+            layerType:'',
             eventToken:'',
             mapMouseOver:{
                 x:100000,
@@ -69,6 +70,7 @@ export default {
             this.map = this.amEvent.getMap();
             this.GIS = this.$ammap.GIS;
             this.defaultSetting = this.amEvent.getDefaultSetting();
+            this.layerType = this.mdata.type;
             this.mapLayers = this.amEvent.getMapLayers();
             this.createLayers();
         },
@@ -77,14 +79,23 @@ export default {
          */
         createLayers(){
             let tempObj = this.mdata;
-            let layerNM = tempObj.type+'layer';
+            let layerNM = tempObj.type+'_layer_amstation';
             this.eventToken = Math.random();
+
+
+            let currenteStatusObj = !this.defaultSetting.mapStateList ?null:this.defaultSetting.mapStateList.find(item=>item.id === this.defaultSetting.defaultMapState);
+            let visibility = false;
+            if (currenteStatusObj){
+                visibility = currenteStatusObj.station.findIndex(item=>item === this.layerType) > -1;
+            } else {
+                visibility = this.visibility;
+            }
             //添加图层
             this.amEvent.emit(EventConst.MAP_ADD_LAYER,{
                 layer:{
                     id:layerNM,//图层ID
                     name:tempObj.name,//图层名称
-                    visibility:this.visibility
+                    visibility: visibility
                 },
                 eventToken:this.eventToken
             });
@@ -96,7 +107,7 @@ export default {
             }
             // for (let key in this.stationLayers){
             let tempObj = this.mdata;//this.stationLayers[key];
-            let layerNM = tempObj.type+'layer';
+            let layerNM = tempObj.type+'_layer_amstation';
             let layer = this.amEvent.getMapLayers()[layerNM];
             if (!layer){
                 return;
@@ -119,12 +130,15 @@ export default {
         }
     },
     mounted () {
+
+        // eslint-disable-next-line new-cap
         this.mapLibs = new mapLibs(this);
         this.amEvent = new AMEvent(this);
-        //地图初始化
-        this.amEvent.on(EventConst.MAP_INIT_EVENT,this.init);
         //地图图层加载完成（一个组件创建一个图层）
         this.amEvent.on(EventConst.MAP_ADD_LAYER_SUCCESS,this.drowmap);
+        //地图初始化
+        this.amEvent.on(EventConst.MAP_INIT_EVENT,this.init);
+
     }
 };
 </script>

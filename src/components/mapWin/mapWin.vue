@@ -3,15 +3,19 @@
       <div class="titleBar" @click="switchWinState" :style="getMapWinTitleStyle" :class="getMapWinTitleClass">
         {{title}}
       </div>
-      <div class="content">
-        <slot></slot>
+      <div ref="content" :style="getContentStyle" class="content" style="border:1px solid #f5f5f5;overflow:hidden;">
+         <ul>
+           <li>
+            <slot></slot>
+           </li>
+         </ul>
       </div>
     </div>
 </template>
 
 <script>
 import {AMEvent} from '@/config/EventConst';
-
+import BScroll from 'better-scroll';
 export default {
     name:'cooding',
     props: {
@@ -53,9 +57,31 @@ export default {
         }
     },
     computed: {
-        getMapWinStyle(){
+        getContentStyle(){
             let tempStyleObj = {};
 
+            if (this.position === 'bottom' ||
+                    this.position === 'bottom-center' ||
+                    this.position === 'bottom-left' ||
+                    this.position === 'bottom-right'){
+                tempStyleObj.height = this.height-16 + 'px';
+            } else if (this.position === 'left' ||
+                    this.position === 'left-center' ||
+                    this.position === 'left-top' ||
+                    this.position === 'left-bottom' ||
+                    this.position === 'right' ||
+                    this.position === 'right-center' ||
+                    this.position === 'right-top' ||
+                    this.position === 'right-bottom'){
+                tempStyleObj.height = this.height-16 + 'px';
+            }
+
+            this.scrollInit();
+
+            return tempStyleObj;
+        },
+        getMapWinStyle(){
+            let tempStyleObj = {};
             tempStyleObj['width'] = this.width+'px';
             tempStyleObj['height'] = this.height+'px';
             // eslint-disable-next-line vue/no-side-effects-in-computed-properties
@@ -163,7 +189,6 @@ export default {
                 }
             }
             return tempStyleObj;
-
         },
         getMapWinTitleStyle(){
             let tempStyleObj = {};
@@ -238,6 +263,7 @@ export default {
     },
     data(){
         return {
+            BS:null
         };
     },
     methods:{
@@ -286,10 +312,32 @@ export default {
                     this.$refs['mapWin'].style['z-index'] = 21;
                 }
             }
+        },
+        scrollInit () {
+            this.$nextTick(() => {
+                if (!this.BS) {
+                    this.BS = new BScroll(this.$refs['content'], {
+                        mouseWheel: true,
+                        click: true
+                    });
+                } else {
+                    this.BS.refresh();
+                }
+            });
+        },
+        scrollDestroy () {
+            try {
+                this.BS.destroy();
+            } catch (e) {
+                delete this.BS;
+                this.BS = null;
+            }
         }
     },
     mounted(){
+        // this.scrollInit();
         this.amEvent = new AMEvent(this);
+        window.test = this;
     }
 };
 </script>

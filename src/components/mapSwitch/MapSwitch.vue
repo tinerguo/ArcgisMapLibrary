@@ -71,11 +71,12 @@ export default {
             this.imagesLayer.hide();
             this.terrainsLayer.hide();
             this.layersLayer.hide();
+
             if (type === 'layers'){
                 this.layersLayer.show();
             } else if (type === 'terrains'){
                 this.terrainsLayer.show();
-            } else if (type === 'imagesLayer'){
+            } else if (type === 'imagesLayer' || type === 'images'){
                 this.imagesLayer.show();
             }
             this.amEvent.setBaseType(type);
@@ -101,7 +102,7 @@ export default {
         this.amEvent = new AMEvent(this);
         let that = this;
         that.amEvent.on(EventConst.MAP_INIT_EVENT,this.init);
-
+        this.amEvent.on(EventConst.BASE_MAP_CHANGE,this.CardClickEvent);
 
     }
 };

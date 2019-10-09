@@ -11,6 +11,11 @@ var MAP_CENTER_STATION= 'mapcenterstation';//地图定位
 var MAP_DROWGEOJSONPOLYGON = 'DrowGeoJsonPolygon';//绘制geojson
 var MAP_STATUS_CHANGE = 'mapStatusChange';//地图状态改变事件
 
+var STATION_LAYER_CHANGE = 'stationLayerChange';//测站图层改变
+var DYNAMIC_LAYER_CHANGE = 'dynamicLayerChange';//动态图层改变
+var GEOJSON_LAYER_CHANGE = 'geojsonLayerChange';//GEOJSON图层改变
+var BASE_MAP_CHANGE = 'baseMapChange';//GEOJSON图层改变
+
 export default {
     MAP_INIT_EVENT,
     MAP_ADD_LAYER,
@@ -19,7 +24,11 @@ export default {
     MAP_CENTER,
     MAP_DROWGEOJSONPOLYGON,
     MAP_CENTER_STATION,
-    MAP_STATUS_CHANGE
+    MAP_STATUS_CHANGE,
+    STATION_LAYER_CHANGE,
+    DYNAMIC_LAYER_CHANGE,
+    GEOJSON_LAYER_CHANGE,
+    BASE_MAP_CHANGE
 };
 
 export function AMEvent(page){

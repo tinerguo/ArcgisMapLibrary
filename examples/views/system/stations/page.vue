@@ -95,7 +95,7 @@
         </div>
       </mapWin>
 
-      <mapWin :isopen="false" title="雨情站" :width="400" :height="330" position='left-top':top='180'>
+      <mapWin :isopen="true" title="雨情站" :width="400" :height="330" position='left-top' :top='180'>
         <div class="leftWinWrap">
             <div  style="text-align:center;">
               雨情站
@@ -109,7 +109,7 @@
         </div>
       </mapWin>
 
-      <mapWin :isopen="true" title="水库" :width="400" :height="330" position='left-top' :top='260'>
+      <mapWin :isopen="false" title="水库" :width="400" :height="330" position='bottom' :left='260'>
         <div class="leftWinWrap">
             <div  style="text-align:center;">
               水库
@@ -448,8 +448,6 @@ export default {
 
   }
   .leftWinWrap{
-    height:300px;
-    overflow: hidden;
     li,ul{
       list-style: none;
     }

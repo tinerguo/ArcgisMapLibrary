@@ -1,7 +1,7 @@
 <template>
   <div>
       <!-- 左侧窗口 -->
-      <div v-if="winType == 'left'" v-show="leftWinVis" class="searchResultWin">
+      <div v-if="winType == 'left'" v-show="leftWinVis" class="searchResultWin left">
         <div class="title">
           图层列表
         </div>
@@ -403,7 +403,7 @@ export default {
     width:250px;
     background: #fff;
     box-shadow: 1px 1px 2px #ccc;
-    z-index: 20;
+    z-index: 24;
     .windCloseBtn{
       position: absolute;
       right:10px;
@@ -487,7 +487,7 @@ export default {
     height:400px;
     background: #fff;
     box-shadow: 1px 1px 2px #ccc;
-    z-index: 20;
+    z-index: 24;
     border:1px solid #333;
     border-radius: 4px;
     .windCloseBtn{

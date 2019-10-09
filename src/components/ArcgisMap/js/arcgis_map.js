@@ -256,7 +256,6 @@ export default {
          */
         loadSpecialLayers(){
 
-
             for (let i =0;i<this.defaultSetting.dynamicLayers.length;i++){
                 let tempObj = this.defaultSetting.dynamicLayers[i];
                 let tempDynamicLayer = new this.GIS.ArcGISDynamicMapServiceLayer(tempObj.url,
@@ -279,7 +278,6 @@ export default {
             /**
              * 创建geoJSON
              * */
-
             for (let j =0;j<this.defaultSetting.geojson.length;j++){
                 let tempObj = this.defaultSetting.geojson[j];
                 let geojsonGraphicsLayer = new this.GIS.GraphicsLayer(tempObj.id);
@@ -443,11 +441,19 @@ export default {
             this.mapLayers['tempLayer'].layer.clear();
         },
         apiDrowGeoJsonPolygon(ringsObj,fillColor,lineWidth,lineColor,layerNM){
+            if (!ringsObj){
+                return;
+            }
             if (!fillColor){
+                // eslint-disable-next-line no-param-reassign
                 fillColor = ringsObj['fillColor'];
+                // eslint-disable-next-line no-param-reassign
                 lineWidth =ringsObj['lineWidth'];
+                // eslint-disable-next-line no-param-reassign
                 lineColor = ringsObj['lineColor'];
+                // eslint-disable-next-line no-param-reassign
                 ringsObj = ringsObj['mapJSONObj'];
+                // eslint-disable-next-line no-param-reassign
                 layerNM = ringsObj['layerNM'];
             }
             try {
@@ -508,7 +514,85 @@ export default {
 
 
         },
-        apiMapStatusChange(data){
+        apiChangeBaseMap(type){
+            this.mapLayers['imagesLayer'].layer.hide();
+            this.mapLayers['terrainsLayer'].layer.hide();
+            this.mapLayers['layersLayer'].layer.hide();
+            if (type === 'terrains'){
+                this.mapLayers['terrainsLayer'].layer.show();
+            } else if (type === 'images'){
+                this.mapLayers['imagesLayer'].layer.show();
+            } else if (type === 'layers'){
+                this.mapLayers['layersLayer'].layer.show();
+            }
+        },
+        apiMapStatusChange(status){
+
+            let data = this.defaultSetting.mapStateList.find((item)=>item.id === status );
+
+            let stationArrSetting = data.station;
+            let geojsonArrSetting = data.geojson;
+            let baseMapSetting = data.baseMap;
+
+            //_layer_amstation
+
+
+            //设置测站图层
+            for (let tempKey in this.mapLayers){
+                if (tempKey.indexOf('_layer_amstation')>-1){
+                    let tempLayer = this.mapLayers[tempKey];
+                    if (stationArrSetting.findIndex(item => item+'_layer_amstation' === tempLayer.layer.id) > -1){
+                        tempLayer.layer.show();
+                    } else {
+                        tempLayer.layer.hide();
+                    }
+                }
+            }
+
+            //设置动态图层
+            let dynamicLayersSetting = data.dynamicLayers;//当前动态图层对象
+            for (let i =0;i<this.defaultSetting.dynamicLayers.length;i++){
+                //临时动态图层对象
+                let layerTemp = this.defaultSetting.dynamicLayers[i];
+                //图层ID
+                let layerID = layerTemp.id;
+                //如果动态图层中设置了改图层
+                if (dynamicLayersSetting[layerID]){
+                    //图层显示
+                    this.mapLayers[layerID].layer.show();
+                    //如果设置了动态图层的子图层
+                    if (dynamicLayersSetting[layerID].show.length > 0){
+                        //设置动态图层
+                        this.mapLayers[layerID].layer.setVisibleLayers(dynamicLayersSetting[layerID].show);
+                    } else {
+                        //如果是空的那么影藏图层
+                        this.mapLayers[layerID].layer.hide();
+                    }
+                } else {
+                    //影藏图层
+                    this.mapLayers[layerID].layer.hide();
+                }
+            }
+
+            //设置geojson图层
+            let geojsonSetting = data.geojson;//当前动态图层对象
+            for (let i =0;i<this.defaultSetting.geojson.length;i++){
+                let tempObj = this.defaultSetting.geojson[i];
+                if (geojsonSetting.findIndex(item => item === tempObj.id) > -1){
+                    this.mapLayers[tempObj.id].layer.show();
+                } else {
+                    this.mapLayers[tempObj.id].layer.hide();
+                }
+            }
+
+            // this.apiChangeBaseMap(data.baseMap);
+            this.amEvent.emit(EventConst.BASE_MAP_CHANGE,data.baseMap);
+            return;
+
+            this.amEvent.emit(EventConst.STATION_LAYER_CHANGE,data);
+            this.amEvent.emit(EventConst.DYNAMIC_LAYER_CHANGE,data);
+            this.amEvent.emit(EventConst.GEOJSON_LAYER_CHANGE,data);
+
 
         }
     },
@@ -543,7 +627,7 @@ export default {
                         }
                     }
                 }
-                //设置geojson
+                // 设置geojson
                 if (currentStatusObj.geojson){
                     for (let i =0;i<this.defaultSetting.geojson.length;i++){
                         let tempObj = this.defaultSetting.geojson[i];
@@ -560,12 +644,8 @@ export default {
         //设置全局参数
         this.amEvent.setDefaultSetting(this.defaultSetting);
         this.gisModules = this.defaultSetting.gisModules;
-        if (this.$ammap.GIS.map){
-            this.GIS = this.$ammap.GIS;
-            this.initMap();
-        } else {
-            this.init();
-        }
+
+
         //对外提供API
         //添加图层
         this.amEvent.on(EventConst.MAP_ADD_LAYER,this.apiAddLayer);
@@ -579,6 +659,15 @@ export default {
         this.amEvent.on(EventConst.MAP_CENTER_STATION,this.apiCenterStatioin);
         //设置地图状态
         this.amEvent.on(EventConst.MAP_STATUS_CHANGE,this.apiMapStatusChange);
+
+
+        if (this.$ammap.GIS.map){
+            this.GIS = this.$ammap.GIS;
+            this.initMap();
+        } else {
+            this.init();
+        }
+
 
     }
 };

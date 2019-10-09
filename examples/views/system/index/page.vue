@@ -9,7 +9,7 @@
       <!-- 底图切换组件 -->
       <mapSwitch></mapSwitch>
       <!-- 底图查询组件 -->
-      <mapSearch @mapMove="mapMove3" @mapClick="mapClick3"></mapSearch>
+      <mapSearch @mapMove="mapMove3" @mapClick="mapClick3" win-type="left"></mapSearch>
       <stationLayers :mdata="stationLayers['雨情站']" @mapMove="mapMove1" @mapClick="mapClick1">
         <template slot="overDiv">
           <div class="popupwin">
@@ -36,6 +36,7 @@
         </template>
         </stationLayers>
       <stationLayers :mdata="stationLayers['水情站']" @mapMove="mapMove2" @mapClick="mapClick2"></stationLayers>
+      <mapMenu-v1 :menu-data="menuData" :top="20" :left="20"></mapMenu-v1>
     </ArcgisMap>
   </div>
 </template>
@@ -46,6 +47,18 @@ import {defaultSetting} from './config/mapSetting.js';
 export default {
     data () {
         return {
+            menuData:[
+                {
+                    name:'水情监测',
+                    icon:'iconhome',
+                    status:'waterState'
+                },
+                {
+                    name:'雨情监测',
+                    icon:'icontubiaozhexiantu',
+                    status:'rainState'
+                }
+            ],
             defaultSetting:defaultSetting,
             radio: '1',
             currentStationData:{},
@@ -134,23 +147,25 @@ export default {
                     clickWinType:'infoTemplate'
                 }
             },
-            gridData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }, {
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }]
+            gridData: [
+                {
+                    date: '2016-05-02',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                }, {
+                    date: '2016-05-04',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                }, {
+                    date: '2016-05-01',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                }, {
+                    date: '2016-05-03',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                }
+            ]
         };
     },
     components: {
@@ -168,8 +183,6 @@ export default {
             'increment'
         ]),
         mapClick1(data,domID){
-            console.log(domID);
-            console.log(data);
             this.currentStationData = data;
         },
         mapClick2(data,domID){

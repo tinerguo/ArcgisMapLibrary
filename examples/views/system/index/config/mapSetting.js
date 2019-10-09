@@ -3,7 +3,7 @@ export let defaultSetting = {
     debugger:true,
     x:117.38984,
     y:39.14688,
-    level:6,
+    level:9,
     baseMap:{
         visibility:true,
         type:'tdt',//谷歌地图:google,天地图:tdt
@@ -85,6 +85,7 @@ export let defaultSetting = {
     geojson:[
         {
             id:'drowplane1Layer',
+            name:'中国',
             geoJSON:zg,
             fillColor:[255,33,22,0],//背景颜色
             lineWidth:4,//边界宽度
@@ -93,6 +94,7 @@ export let defaultSetting = {
         },
         {
             id:'drowplane2Layer',
+            name:'山西',
             geoJSON:xx,
             fillColor:[255,33,22,0.3],//背景颜色
             lineWidth:2,//边界宽度
@@ -131,7 +133,8 @@ export let defaultSetting = {
             station:['water'],
             dynamicLayers:{
                 'NHBackalllayer':{
-                    show:[]
+                    show:[0,1,2,3,4,5,6,7,8],
+                    visibility:true
                 }
             },
             geojson:['drowplane1Layer'],

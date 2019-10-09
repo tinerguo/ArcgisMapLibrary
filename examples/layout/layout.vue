@@ -21,12 +21,12 @@
           <router-link :to="{ name: 'stations'}" tag="li">
             <a>测站绘制</a>
           </router-link>
-          <li>
+          <!-- <li>
             <a style="text-decoration:line-through;">底图校准</a>
           </li>
           <li>
             <a  style="text-decoration:line-through;">地图在线编辑</a>
-          </li>
+          </li> -->
         </ul>
       </div>
 		</div>

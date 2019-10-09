@@ -1,6 +1,7 @@
 <template>
-    <div v-show="mapinit" class="mapMenu01" >
-
+    <div class="mapMenuItem01" @click="menuClick" >
+      <mapFont class="menuIcon" :name="data.icon"></mapFont>
+      <div class="text">{{data.name}}</div>
     </div>
 </template>
 
@@ -10,9 +11,9 @@ import EventConst,{AMEvent} from '@/config/EventConst';
 export default {
     name:'mapMenu01',
     props: {
-        labelwidth:{
-            type: Number,
-            default: 45
+        data:{
+            type: Object,
+            default: ()=> {}
         }
     },
     data(){
@@ -29,6 +30,9 @@ export default {
 
     },
     methods:{
+        menuClick(){
+            this.$emit('menuClick',this.data);
+        },
         /**
          * 地图初始化
          */
@@ -41,12 +45,36 @@ export default {
         }
     },
     mounted(){
-        this.amEvent = new AMEvent(this);
-        this.amEvent.on(EventConst.MAP_INIT_EVENT,this.init);
     }
 };
 </script>
 
 <style scoped lang = "scss">
-
+  .mapMenuItem01{
+    width:80px;
+    height:70px;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+    margin-right:20px;
+    color: #fff;
+    padding-top:2px;
+    box-sizing: border-box;
+    .menuIcon{
+      font-size: 40px;
+      font-weight: 300;
+    }
+    .text{
+      margin-top:2px;
+    }
+  }
+  .mapMenuItem01.active{
+    background: rgba(255,255,255,0.3);
+  }
+  .mapMenuItem01.active:hover{
+    background: rgba(255,255,255,0.3);
+  }
+  .mapMenuItem01:hover{
+    background: rgba(255,255,255,0.1);
+  }
 </style>

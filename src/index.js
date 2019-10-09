@@ -13,6 +13,12 @@ import mapLend from '@/components/mapLend/mapLend.vue';
 import mapDrow from '@/components/mapDrow/mapDrow.vue';
 import mapWin from '@/components/mapWin/mapWin.vue';
 
+import mapMenuV1 from '@/components/mapMenus/mapMenuV1/mapMenuV1.vue';
+import menuItemV1 from '@/components/mapMenus/mapMenuV1/components/menuItem.vue';
+
+import mapMenuV2 from '@/components/mapMenus/mapMenuV2/mapMenuV2.vue';
+import menuItemV2 from '@/components/mapMenus/mapMenuV2/components/menuItem.vue';
+
 require('@/assets/map.css');
 const components = {
     ArcgisMap:ArcgisMap,
@@ -24,7 +30,11 @@ const components = {
     stationLayers:stationLayers,
     mapLend:mapLend,
     mapDrow:mapDrow,
-    mapWin:mapWin
+    mapWin:mapWin,
+    mapMenuV1:mapMenuV1,
+    menuItemV1:menuItemV1,
+    mapMenuV2:mapMenuV2,
+    menuItemV2:menuItemV2
 };
 
 const install = function(Vue) {

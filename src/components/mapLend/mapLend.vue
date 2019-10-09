@@ -23,6 +23,8 @@
 
         <div style="margin:16px 0;">
           <div class="sub-title">图层</div>
+
+
           <!-- <div class="line"></div> -->
           <!-- <div class="flex-line">
             <el-checkbox-group v-model="lendLayersmodel">
@@ -31,6 +33,13 @@
                   </el-checkbox>
             </el-checkbox-group>
           </div> -->
+
+              <el-checkbox-group v-model="geojsonLayermodel"   @change="geoLayerListChange">
+                    <el-checkbox v-for="(obj) in geojsonLayer" :label="obj.id" :key="obj.id">
+                      {{obj.name}}
+                    </el-checkbox>
+              </el-checkbox-group>
+
             <div  v-for="(obj,index) in lendLayerObj" :key="index" class="flex-line">
               <div style="width:100%;" class="layer-title">{{obj.name}}</div>
               <el-checkbox-group v-model="lendLayersmodel"  @change="layerListChange">
@@ -88,7 +97,9 @@ export default {
             lendStationLayers:[],
             baseMapList:['底图','标注','遮罩'],
             layerMapList:[],
-            stationsMapList:[]
+            stationsMapList:[],
+            geojsonLayer:[],
+            geojsonLayermodel:[]
         };
     },
     computed:{
@@ -122,6 +133,8 @@ export default {
             }
             //绘制动态图层图例信息
             this.dynLayers();
+            //绘制geojson图例信息
+            this.setGeoJsonLayer();
         },
         /**
          * 动态设置label的宽度
@@ -131,6 +144,18 @@ export default {
                 for (let i =0;i<document.getElementsByClassName('el-checkbox__label').length;i++){
                     let tempObj = document.getElementsByClassName('el-checkbox__label')[i];
                     tempObj.style.width = this.labelwidth+'px';
+                }
+            }
+        },
+        /**
+         * 设置geojson图层图例
+         */
+        setGeoJsonLayer(){
+            for (let i =0;i<this.defaultSetting.geojson.length;i++){
+                let tempObj = this.defaultSetting.geojson[i];
+                this.geojsonLayer.push(tempObj);
+                if (tempObj.visibility){
+                    this.geojsonLayermodel.push(tempObj.id);
                 }
             }
         },
@@ -240,6 +265,19 @@ export default {
                 }
             }
         },
+        geoLayerListChange(geojsonLayermodel){
+            for (let i =0;i<this.defaultSetting.geojson.length;i++){
+                let tempObj = this.defaultSetting.geojson[i];
+                let index = geojsonLayermodel.findIndex(item=>tempObj.id == item);
+
+                if (index > -1){
+                    this.amEvent.getMapLayers()[tempObj.id].layer.show();
+                } else {
+                    this.amEvent.getMapLayers()[tempObj.id].layer.hide();
+                }
+            }
+
+        },
         /*
         * 添加测站
         */
@@ -255,9 +293,35 @@ export default {
         stationLayerClick(){
             for (let i =0;i<this.lendStationLayers.length;i++){
                 let id = this.lendStationLayers[i].id;
-                this.map.getLayer(id).hide();
+                this.amEvent.getMapLayers()[id].layer.hide();
+                // this.map.getLayer(id).hide();
                 if (this.stationsMapList.indexOf(id)>-1){
                     this.map.getLayer(id).show();
+                }
+            }
+
+        },
+        //状态修改事件
+        apiMapStatusChange(status){
+            let data = this.defaultSetting.mapStateList.find((item)=>item.id === status );
+
+            //设置测站
+            this.stationsMapList = [];
+            for (let i =0;i<data.station.length;i++){
+                this.stationsMapList.push(data.station[i]+'_layer_amstation');
+            }
+
+            //设置geojson
+            this.geojsonLayermodel = data.geojson;
+
+
+            let dynamicLayersSetting = data.dynamicLayers;
+
+            this.lendLayersmodel = [];
+            for (let key in dynamicLayersSetting){
+                for (let i =0;i<dynamicLayersSetting[key].show.length;i++){
+                    let layerID = dynamicLayersSetting[key].show[i];
+                    this.lendLayersmodel.push(key+'-'+layerID);
                 }
             }
 
@@ -276,6 +340,7 @@ export default {
         // this.$ammap.$on(EventConst.MAP_INIT_EVENT,this.init);
         this.amEvent.on(EventConst.MAP_ADD_LAYER,this.stationAddEvent);
         this.amEvent.on(EventConst.MAP_INIT_EVENT,this.init);
+        this.amEvent.on(EventConst.MAP_STATUS_CHANGE,this.apiMapStatusChange);
     }
 };
 </script>
