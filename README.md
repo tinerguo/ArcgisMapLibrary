@@ -100,7 +100,7 @@
 
 
 
-
+~~~
 defaultSetting:{
                 x:117.38984,
                 y:39.14688,
@@ -221,7 +221,8 @@ defaultSetting:{
                     ]
                 }
             }
-
+~~~
+~~~
             测站配置：
             stationLayers:{
                 '雨情站':{
@@ -308,3 +309,4 @@ defaultSetting:{
                     clickWinType:'infoTemplate'
                 }
             },
+~~~
