@@ -1,5 +1,6 @@
 
 export let defaultSetting = {
+    arcgisSDK:'3.9',
     debugger:true,
     x:117.38984,
     y:39.14688,

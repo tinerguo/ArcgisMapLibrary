@@ -45,13 +45,11 @@ export default {
          * arcgis loader 初始化资源
          */
         init() {
+
             // 加载css;
-            loadCss(window.configs.arcgisApiURL+'js/esri/css/esri.css');
-            // loadCss('3.27');
-            // 加载模块
-            loadModules(this.gisModules, {
-                url: window.configs.arcgisApiURL+'init.js',
-                // version: '3.27',
+            loadCss(!this.defaultSetting.arcgisSDK?window.configs.arcgisApiURL+'js/esri/css/esri.css':this.defaultSetting.arcgisSDK);
+
+            let arcgisConfig = {
                 dojoConfig: {
                     parseOnLoad: false,
                     async: true,
@@ -60,7 +58,16 @@ export default {
                         window.configs.dojoConfigPackages
                     ]
                 }
-            }).then(this.loadModules)
+            };
+
+            if (!this.defaultSetting.arcgisSDK){
+                arcgisConfig['url'] = window.configs.arcgisApiURL+'init.js';
+            } else {
+                arcgisConfig['version'] = this.defaultSetting.arcgisSDK;
+            }
+
+            // 加载模块
+            loadModules(this.gisModules,arcgisConfig).then(this.loadModules)
                 .then(this.initMap);
         },
         /**
@@ -190,7 +197,7 @@ export default {
                 this.addMapLayer('shadeLayer', {
                     layer: shadeLayer,
                     order:4
-                }, this.defaultSetting.baseMap.labelLayerVisibility);
+                }, this.defaultSetting.baseMap.shadeLayer.visibility);
 
             }
             //添加谷歌相应地图 影像图、矢量图、遮罩、标注
@@ -237,7 +244,7 @@ export default {
                 this.addMapLayer('shadeLayer', {
                     layer: shadeLayer,
                     order:4
-                }, this.defaultSetting.baseMap.labelLayerVisibility);
+                }, this.defaultSetting.baseMap.shadeLayer.visibility);
             }
 
             //添加动态图层

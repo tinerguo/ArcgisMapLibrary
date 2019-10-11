@@ -1,10 +1,10 @@
 export let defaultSetting = {
+    // arcgisSDK:'3.9',
     debugger:true,
     x:117.38984,
     y:39.14688,
     level:6,
     dynamicLayers:[
-
     ],
     geojson:[
         {
@@ -20,8 +20,8 @@ export let defaultSetting = {
         type:'tdt',//谷歌地图:google,天地图:tdt
         defaultshow:'images',//影像图:images,地形图:terrains,矢量图:layers
         labelLayerVisibility:true,//地图标注
-        shadeLayer:{
-            visibility:false,
+        shadeLayer:{//阴影标注
+            visibility:true,
             backgroundColor:'#fff',
             opacity:0.5
         }

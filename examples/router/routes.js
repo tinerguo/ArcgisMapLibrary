@@ -63,11 +63,7 @@ const frameIn = [
  * 在主框架之外显示
  */
 const frameOut = [
-    {
-        path: '/login',
-        name: 'login',
-        component: _import('system/login')
-    }
+
 ];
 
 /**

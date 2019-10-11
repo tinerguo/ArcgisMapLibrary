@@ -15,10 +15,9 @@ export const settingTemplate = {
         type:'tdt',//谷歌地图:google,天地图:tdt
         defaultshow:'terrains',//影像图:images,地形图:terrains,矢量图:layers
         labelLayerVisibility:true,//地图标注
-        shadeLayer:{
-            visibility:false,
-            backgroundColor:'#fff',
-            opacity:0.5
+        shadeLayer:{//阴影标注
+            // visibility:true,
+            // opacity:0.5
         }
     },
     lend:{

@@ -3,7 +3,7 @@
     :class="{'expand':this.expand}"
      class="mapSwitch" id=mapType-wrapper >
         <div v-show="mapLoadFlag" id="mapType">
-           <div data-type="imagesLayer" @click="CardClickEvent('imagesLayer')" :class="{'active':this.currentMap === 'imagesLayer'}" class="mapTypeCard earth">
+           <div data-type="imagesLayer" @click="CardClickEvent('imagesLayer')" :class="{'active':this.currentMap === 'imagesLayer' || this.currentMap === 'images'}" class="mapTypeCard earth">
             <div>影像图</div>
           </div>
           <div data-type="layers" @click="CardClickEvent('terrains')"  :class="{'active':this.currentMap === 'terrains'}" class="mapTypeCard normal choosedType ">
@@ -67,6 +67,7 @@ export default {
             this.amEvent.setBaseType(this.currentMap);
         },
         CardClickEvent(type){
+            debugger;
             this.currentMap = type;
             this.imagesLayer.hide();
             this.terrainsLayer.hide();

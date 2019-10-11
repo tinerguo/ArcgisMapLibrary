@@ -16,7 +16,7 @@ function resolve (dir) {
 
 module.exports = merge(webpackBaseConfig, {
     entry: {
-        amuiLayout:'./src/index.js'
+        amuimap:'./src/index.js'
     },
     output:{
         path: path.resolve(__dirname, '../dist'),
@@ -43,13 +43,6 @@ module.exports = merge(webpackBaseConfig, {
                 NODE_ENV: '"production"'
             }
         }),
-        new CopyWebpackPlugin([
-            {
-                from: path.resolve(__dirname, '../src/static'),
-                to: path.resolve(__dirname, '../dist/static'),
-                ignore: ['.*']//忽略
-            }
-        ]),
         new webpack.optimize.UglifyJsPlugin({
             parallel: true,
             sourceMap: false,
