@@ -108,7 +108,7 @@ defaultSetting:{
                 dynamicLayers:[
                     {
                         id:'DLbackalllayer',
-                        url:'http://111.30.103.114:6080/arcgis/rest/services/DongLiMapFlood/MapServer',
+                        url:'http://xxxx:6080/arcgis/rest/services/DongLiMapFlood/MapServer',
                         show:[0,1,2,3,4,5,6,7,9,10],
                         layers:{
                             0:'险工',
@@ -131,7 +131,7 @@ defaultSetting:{
                     },
                     {
                         id:'NHBackalllayer',
-                        url:'http://111.30.97.35:8099/arcgis/rest/services/NHMAP/MapServer',
+                        url:'http://xxxx:8099/arcgis/rest/services/NHMAP/MapServer',
                         show:[0,1,2,3,4,5,6,7,8],
                         layers:{
                             0:'二级河道new',
